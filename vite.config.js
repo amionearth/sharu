@@ -92,4 +92,4 @@ function localServices() {
   };
 }
 
-export default defineConfig({ plugins: [localServices()], server: { host: '127.0.0.1', port: 5173, strictPort: true }, build: { target: 'es2022' } });
+export default defineConfig({ plugins: [localServices()], server: { host: '127.0.0.1', port: 5173, strictPort: true }, build: { target: 'es2022', rolldownOptions: { external: ['udgam-textnorm', 'node:fs/promises'] } } });

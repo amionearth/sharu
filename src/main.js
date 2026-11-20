@@ -537,7 +537,7 @@ function resampleTo16k(buffer) {
 async function loadShruti() {
   if (!asrPromise) asrPromise = (async () => {
     $('#chat-status').textContent = 'LOADING SHRUTI MALAYALAM MODEL…';
-    const [{ createShruti }, ort] = await Promise.all([import('shruti-onnx'), import('onnxruntime-web')]);
+    const [{ createShruti }, ort] = await Promise.all([import('shruti-onnx'), import('onnxruntime-web/wasm')]);
     ort.env.wasm.numThreads = 1;
     return createShruti({ ort, language: 'malayalam' });
   })();
@@ -762,7 +762,7 @@ $('#talk-input').addEventListener('keydown',event=>{if(event.key==='Enter'){even
 $('#send-talk').onclick=()=>sendNpcLine($('#talk-input').value);
 $('#record-talk').onclick=toggleRecording;
 document.querySelectorAll('.quick-lines button').forEach(button=>button.onclick=()=>sendNpcLine(button.dataset.line));
-document.querySelectorAll('.language').forEach(button=>button.onclick=()=>{document.querySelectorAll('.language').forEach(b=>b.classList.remove('active'));button.classList.add('active');talkLanguage=button.dataset.language;voiceOn=voiceOn||voiceReady.ml||voiceReady.en;});
+document.querySelectorAll('.language').forEach(button=>button.onclick=()=>{document.querySelectorAll('.language').forEach(b=>b.classList.remove('active'));button.classList.add('active');talkLanguage=button.dataset.language;});
 $('#voice-toggle').onclick=()=>{voiceOn=!voiceOn;$('#voice-toggle').textContent=voiceOn?'VOICE ON':'VOICE OFF';$('#voice-toggle').classList.toggle('active',voiceOn);if(voiceOn&&(!voiceReady.ml||!voiceReady.en))toast('Install local Indic Tiny voices with npm run voice:models.');};
 $('#resume-game').onclick=()=>setPause(false);
 $('#save-game').onclick=()=>saveGame(true);
