@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#121512" />
+    <meta name="description" content="Sheru Bhai: The King of Kochi — a local-first open-world story game." />
+    <title>Sheru Bhai — The King of Kochi</title>
+  </head>
+  <body>
+    <div id="app">
+      <canvas id="game-canvas" aria-label="Sheru Bhai game world"></canvas>
+      <div id="loading-screen" class="loading-screen">
+        <div class="loading-card"><div class="crest">SB</div><div class="eyebrow">MAHE · KOCHI · KERALA</div><h1>SHERU BHAI</h1><div class="loading-sub">THE KING OF KOCHI</div><div class="load-track"><i id="load-progress"></i></div><div id="load-message">Preparing your city…</div></div>
+      </div>
+      <div id="title-screen" class="title-screen hidden">
+        <div class="title-top"><div class="crest small">SB</div><span>ORIGINAL OPEN-WORLD STORY</span><div class="top-right">LOCAL BUILD · v0.1</div></div>
+        <div class="title-content"><div class="eyebrow">A STORY FROM MAHE TO KOCHI</div><h1>THE LITTLE<br><em>LION.</em></h1><p>A juice-shop boy. A city that forgot its old king.<br>One family secret that changes everything.</p><div class="mode-grid"><button class="mode-card story-card" id="start-story"><span class="mode-icon">01</span><span class="mode-name">STORY MODE</span><span class="mode-copy">Begin Sheru’s story · Mission 1</span><span class="mode-arrow">↗</span></button><button class="mode-card free-card" id="start-free"><span class="mode-icon">∞</span><span class="mode-name">OPEN WORLD</span><span class="mode-copy">Explore, drive and meet the locals</span><span class="mode-arrow">↗</span></button></div><button id="continue-game" class="continue-button hidden">CONTINUE YOUR STORY <span>→</span></button><div id="voice-status" class="voice-status">VOICE: LOCAL SPEECH MODELS LOAD WHEN YOU USE THEM</div></div>
+        <div class="title-bottom"><span>WASD MOVE <b>·</b> MOUSE LOOK <b>·</b> T TALK <b>·</b> E INTERACT <b>·</b> F VEHICLE</span><span>INSPIRED BY KERALA. BUILT AS ITS OWN WORLD.</span></div>
+      </div>
+      <div id="hud" class="hud hidden">
+        <div class="hud-top"><div class="brand-chip"><span class="crest tiny">SB</span><div><b>SHERU BHAI</b><small id="mode-label">STORY MODE</small></div></div><div class="hud-mission"><span class="mission-kicker" id="mission-kicker">MAIN MISSION · 01</span><b id="mission-title">JUICE MASTER</b><span id="objective-text">Talk to Amma at the juice counter.</span></div><div class="hud-money"><span>WALLET</span><b id="money-text">₹ 0</b></div></div>
+        <div class="hud-bottom"><div class="minimap"><div class="map-ring"><i class="road road-a"></i><i class="road road-b"></i><i class="map-player">▲</i><i class="map-npc npc-one">•</i><i class="map-npc npc-two">•</i></div><span class="map-label">MAHE · MARKET LANE</span></div><div class="interaction-tip" id="interaction-tip">WALK CLOSE TO A CHARACTER</div><div class="control-legend"><kbd>W A S D</kbd> MOVE <kbd>SHIFT</kbd> RUN <kbd>MOUSE</kbd> LOOK <kbd>T</kbd> TALK</div></div>
+        <div id="toast" class="toast"></div>
+      </div>
+      <section id="cutscene" class="cutscene hidden"><div class="letterbox top"></div><div class="cutscene-tag"><span>MAHE · MORNING</span><span id="cutscene-count">SCENE 01 / 08</span></div><div class="cutscene-bottom"><div class="speaker" id="cutscene-speaker">MOTHER</div><div id="cutscene-line" class="cutscene-line"></div><div class="cutscene-controls"><span>PRESS ENTER OR CLICK TO CONTINUE</span><button id="skip-cutscene">SKIP SCENE ↗</button></div></div><div class="letterbox bottom"></div></section>
+      <section id="dialogue-panel" class="dialogue-panel hidden"><header class="dialogue-header"><div class="portrait" id="npc-initial">RJ</div><div class="npc-caption"><small id="npc-role">LOCAL SHOPKEEPER</small><b id="npc-name">Rajan</b></div><button id="close-dialogue" aria-label="Close">×</button></header><div class="npc-opener" id="npc-opener"></div><div id="chat-log" class="chat-log"></div><div class="quick-lines"><button data-line="Njan Sheru aanu. Entha ivide nadakkunne?">What’s happening here?</button><button data-line="Njan oru juice kada nadathunnu. Ninte karyam entha?">Tell me about yourself</button><button data-line="Sheru Bhai varunnu ennu kettittundo?">Heard of Sheru Bhai?</button></div><div class="chat-bar"><button id="record-talk" title="Record one line locally">●</button><input id="talk-input" placeholder="Speak or type Manglish / English…" maxlength="220" /><button id="send-talk">SEND <span>↗</span></button></div><div class="chat-foot"><span id="chat-status">SHRUTI · OFFLINE SPEECH RECOGNITION</span><div class="language-choice"><button class="language active" data-language="mixed">MIX</button><button class="language" data-language="ml">മലയാളം</button><button class="language" data-language="en">ENGLISH</button></div></div></section>
+      <div id="mission-toast" class="mission-toast hidden"><div>MISSION UPDATED</div><b id="mission-toast-text"></b></div>
+      <div id="pause-menu" class="pause-menu hidden"><div class="pause-card"><div class="eyebrow">SHERU BHAI · LOCAL SAVE</div><h2>PAUSED</h2><button id="resume-game">RESUME <span>ESC</span></button><button id="save-game">SAVE GAME <span>✓</span></button><button id="back-title">BACK TO TITLE <span>↗</span></button><small>Progress is saved on this device.</small></div></div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

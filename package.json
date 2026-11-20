@@ -1,0 +1,20 @@
+{
+  "name": "sheru-bhai-kochi-web-game",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "voice:models": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/setup-voice.ps1"
+  },
+  "dependencies": {
+    "onnxruntime-web": "^1.31.1",
+    "shruti-onnx": "^0.2.0",
+    "three": "^0.187.0"
+  },
+  "devDependencies": {
+    "vite": "^8.3.8"
+  }
+}

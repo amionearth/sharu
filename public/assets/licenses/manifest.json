@@ -1,0 +1,611 @@
+[
+  {
+    "file": "cars/Textures/colormap.png",
+    "source": "https://kenney.nl/assets/car-kit",
+    "download": "Models/GLB format/Textures/colormap.png",
+    "author": "Kenney",
+    "license": "CC0-1.0",
+    "sha256": "f3622a03a20c6696065cae9cbe391351be873508af190c2ebd1d420c055787a5"
+  },
+  {
+    "file": "cars/ambulance.glb",
+    "source": "https://kenney.nl/assets/car-kit",
+    "download": "Models/GLB format/ambulance.glb",
+    "author": "Kenney",
+    "license": "CC0-1.0",
+    "sha256": "9e429e2b6202c0d78d0c38b2adbaae6b77716bb2a0f6fbb2811556e1fb31edba"
+  },
+  {
+    "file": "cars/delivery-flat.glb",
+    "source": "https://kenney.nl/assets/car-kit",
+    "download": "Models/GLB format/delivery-flat.glb",
+    "author": "Kenney",
+    "license": "CC0-1.0",
+    "sha256": "2973152df7699767692ce890b3a0845a11333a52a23aa74b86a12ed443254c1b"
+  },
+  {
+    "file": "cars/delivery.glb",
+    "source": "https://kenney.nl/assets/car-kit",
+    "download": "Models/GLB format/delivery.glb",
+    "author": "Kenney",
+    "license": "CC0-1.0",
+    "sha256": "426a3e3a2c242c05c889b1445ba02ef95b2c8b7cd6f597e1275ef736a826014b"
+  },
+  {
+    "file": "cars/firetruck.glb",
+    "source": "https://kenney.nl/assets/car-kit",
+    "download": "Models/GLB format/firetruck.glb",
+    "author": "Kenney",
+    "license": "CC0-1.0",
+    "sha256": "c0c0a22809316536468da7e9c7f57b8ec1a8e387ec3a1cde032976c6d8a6c7a4"
+  },
+  {
+    "file": "cars/garbage-truck.glb",
+    "source": "https://kenney.nl/assets/car-kit",
+    "download": "Models/GLB format/garbage-truck.glb",
+    "author": "Kenney",
+    "license": "CC0-1.0",
+    "sha256": "6f2943e0ba4c6d86eb69a9243224259d6e0f169f474228439cda0579d49d3509"
+  },
+  {
+    "file": "cars/hatchback-sports.glb",
+    "source": "https://kenney.nl/assets/car-kit",
+    "download": "Models/GLB format/hatchback-sports.glb",
+    "author": "Kenney",
+    "license": "CC0-1.0",
+    "sha256": "bd5c9d4c3b4bdd254a66b8426563a68b1487ae7a5076df3a2488e6ffed7be64f"
+  },
+  {
+    "file": "cars/police.glb",
+    "source": "https://kenney.nl/assets/car-kit",
+    "download": "Models/GLB format/police.glb",
+    "author": "Kenney",
+    "license": "CC0-1.0",
+    "sha256": "a617b880594f56239b7ac4cf6fd4d74ebdae3ba6c5d842e77c76a5906eff352a"
+  },
+  {
+    "file": "cars/porsche-930.glb",
+    "source": "import/porsche-911930-turbo-1975-wwwvecarzcom.zip",
+    "author": "",
+    "license": "unknown - user supplied",
+    "sha256": "c00bdbfea79dd304f76e5d337c51a045b98344ec9229d6ec48ad4dd32d62d5c2"
+  },
+  {
+    "file": "cars/race-future.glb",
+    "source": "https://kenney.nl/assets/car-kit",
+    "download": "Models/GLB format/race-future.glb",
+    "author": "Kenney",
+    "license": "CC0-1.0",
+    "sha256": "869e2a58d2c12de474e824aff137334491b8f234b97127cf23f1ea04e42deec6"
+  },
+  {
+    "file": "cars/race.glb",
+    "source": "https://kenney.nl/assets/car-kit",
+    "download": "Models/GLB format/race.glb",
+    "author": "Kenney",
+    "license": "CC0-1.0",
+    "sha256": "e1408c4c6e135f5a39c5f34cbfbcac9ae21c5c491e793fdee74bccac8334d942"
+  },
+  {
+    "file": "cars/sedan-sports.glb",
+    "source": "https://kenney.nl/assets/car-kit",
+    "download": "Models/GLB format/sedan-sports.glb",
+    "author": "Kenney",
+    "license": "CC0-1.0",
+    "sha256": "2889c428ca1dd9c975c3ff760eb8757883490410555ab60b818f712f583826d6"
+  },
+  {
+    "file": "cars/sedan.glb",
+    "source": "https://kenney.nl/assets/car-kit",
+    "download": "Models/GLB format/sedan.glb",
+    "author": "Kenney",
+    "license": "CC0-1.0",
+    "sha256": "b532ea7d2c59f7f6b22b138cf1955218a2c1898f1cea932af4d3fd563c3959b7"
+  },
+  {
+    "file": "cars/suv-luxury.glb",
+    "source": "https://kenney.nl/assets/car-kit",
+    "download": "Models/GLB format/suv-luxury.glb",
+    "author": "Kenney",
+    "license": "CC0-1.0",
+    "sha256": "9e2a79dc050189d4555a88d2e9da0f30ff946ba74f1d43b5b3bda3c193d1f7d7"
+  },
+  {
+    "file": "cars/suv.glb",
+    "source": "https://kenney.nl/assets/car-kit",
+    "download": "Models/GLB format/suv.glb",
+    "author": "Kenney",
+    "license": "CC0-1.0",
+    "sha256": "9df31f6e89e927a8176fc792aa125f0b19dc1ba29d2025bfef7c4f4d6ab1778a"
+  },
+  {
+    "file": "cars/taxi.glb",
+    "source": "https://kenney.nl/assets/car-kit",
+    "download": "Models/GLB format/taxi.glb",
+    "author": "Kenney",
+    "license": "CC0-1.0",
+    "sha256": "3803539718ffd3b84b515dbce8ed6b489f1ff5be58edb1903d2c5db5c584bdc7"
+  },
+  {
+    "file": "cars/tractor-police.glb",
+    "source": "https://kenney.nl/assets/car-kit",
+    "download": "Models/GLB format/tractor-police.glb",
+    "author": "Kenney",
+    "license": "CC0-1.0",
+    "sha256": "25cd7801798fd1c81bb82cd8e9d5ec1ec1797b9fb720304efff5e6cbc7949142"
+  },
+  {
+    "file": "cars/truck-flat.glb",
+    "source": "https://kenney.nl/assets/car-kit",
+    "download": "Models/GLB format/truck-flat.glb",
+    "author": "Kenney",
+    "license": "CC0-1.0",
+    "sha256": "4279862f2442e96c6603c514edf50bfb932707545695d8c4747611cd3796cf3b"
+  },
+  {
+    "file": "cars/truck.glb",
+    "source": "https://kenney.nl/assets/car-kit",
+    "download": "Models/GLB format/truck.glb",
+    "author": "Kenney",
+    "license": "CC0-1.0",
+    "sha256": "5e1bc66c343501dd7d5734b57e672dd949bf95d7abdce680c6508cef99d374f8"
+  },
+  {
+    "file": "cars/van.glb",
+    "source": "https://kenney.nl/assets/car-kit",
+    "download": "Models/GLB format/van.glb",
+    "author": "Kenney",
+    "license": "CC0-1.0",
+    "sha256": "ed4ed56e8e5ed98db050af09ed2062b3b6bb7b93eab1e563cb6774b387b233a1"
+  },
+  {
+    "file": "characters/men-0.glb",
+    "source": "https://quaternius.com/packs/animatedmen.html",
+    "download": "https://static.poly.pizza/66b57880-bcb0-479a-8d72-5c3e88afaa39.glb",
+    "author": "Quaternius",
+    "license": "CC0-1.0",
+    "sha256": "31ff1539e7a9a209d4eb1107e696d798fedc7e35d84a58bbabfdc0f1b8b73763"
+  },
+  {
+    "file": "characters/men-1.glb",
+    "source": "https://quaternius.com/packs/animatedmen.html",
+    "download": "https://static.poly.pizza/3746be88-6799-4817-929b-6bc067c47caa.glb",
+    "author": "Quaternius",
+    "license": "CC0-1.0",
+    "sha256": "dad8fa3ca2bc7760892f9ff47f544941179e50acb2aa772cf9f035154a37fc58"
+  },
+  {
+    "file": "characters/men-2.glb",
+    "source": "https://quaternius.com/packs/animatedmen.html",
+    "download": "https://static.poly.pizza/985eacbf-9dde-44b7-9270-4e35c8400b13.glb",
+    "author": "Quaternius",
+    "license": "CC0-1.0",
+    "sha256": "40c62848350df6d13cc6eed20f30c3406a7761542236d8a9f6c3a4060d005e97"
+  },
+  {
+    "file": "characters/men-3.glb",
+    "source": "https://quaternius.com/packs/animatedmen.html",
+    "download": "https://static.poly.pizza/e6019b9f-aed0-400c-8df4-ce5b648e9b82.glb",
+    "author": "Quaternius",
+    "license": "CC0-1.0",
+    "sha256": "48536b0e0ea375f0831dbf5154b4c2eafda8b6c9c19ba0996dd298f2fcc9164c"
+  },
+  {
+    "file": "characters/player.glb",
+    "source": "https://quaternius.com/packs/ultimatemodularcharacters.html",
+    "download": "https://static.poly.pizza/90a9e2d4-053f-42f1-99a2-8f5e1180ea7f.glb",
+    "author": "Quaternius",
+    "license": "CC0-1.0",
+    "sha256": "fea7e71271203e7073f1a073fa1208de7402df276f87f80e149bf7589b5d46b4"
+  },
+  {
+    "file": "characters/women-0.glb",
+    "source": "https://quaternius.com/packs/animatedwomen.html",
+    "download": "https://static.poly.pizza/51d5abdd-bb87-4b8d-9967-21738ffb8437.glb",
+    "author": "Quaternius",
+    "license": "CC0-1.0",
+    "sha256": "99c4df0aaabd19022809facc68f5fb5f564d35df3a9893c273a31fdaacf68e96"
+  },
+  {
+    "file": "characters/women-1.glb",
+    "source": "https://quaternius.com/packs/animatedwomen.html",
+    "download": "https://static.poly.pizza/906a0cbe-b0a4-4312-b898-0f974b6f6771.glb",
+    "author": "Quaternius",
+    "license": "CC0-1.0",
+    "sha256": "bae371b11e0dcd5dbd26442025567ca9f7041781f3410259d6ec379bffcbac27"
+  },
+  {
+    "file": "characters/women-2.glb",
+    "source": "https://quaternius.com/packs/animatedwomen.html",
+    "download": "https://static.poly.pizza/9a6a3e55-23ce-4d5c-89bc-7d3f30307ed0.glb",
+    "author": "Quaternius",
+    "license": "CC0-1.0",
+    "sha256": "9809532f4562ebfd3976bd96eeebd1efc1008d781aa71a15048db5bf5ae7344c"
+  },
+  {
+    "file": "characters/women-3.glb",
+    "source": "https://quaternius.com/packs/animatedwomen.html",
+    "download": "https://static.poly.pizza/a642af96-e239-4c5f-b50d-7661ff51deec.glb",
+    "author": "Quaternius",
+    "license": "CC0-1.0",
+    "sha256": "53db49ba84193beb60173e94396764c86f7805752582a81dfdfd7f0889a10783"
+  },
+  {
+    "file": "props/covered_car.glb",
+    "source": "https://polyhaven.com/a/covered_car",
+    "download": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/covered_car/covered_car_1k.gltf",
+    "author": "Poly Haven",
+    "license": "CC0-1.0",
+    "source_sha256": "80b210b08673833a8085812b9ee71286213b2af92654886e5a1a368977265aa7",
+    "sha256": "634f69040d2b38aa66a6d1d6152178ae47d3fbf5593f5e72c0c180fbbae9ba8b"
+  },
+  {
+    "file": "props/fire_hydrant.glb",
+    "source": "https://polyhaven.com/a/fire_hydrant",
+    "download": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/fire_hydrant/fire_hydrant_1k.gltf",
+    "author": "Poly Haven",
+    "license": "CC0-1.0",
+    "source_sha256": "aaca81b2904e6e5f1fb10a854c7b9a921232624387d1f8757b5c6bdaedcd9eb0",
+    "sha256": "4330a20471e19640e1ca3b88ef3aac789bd53af2f97c451c9c74dc5d195b5c7d"
+  },
+  {
+    "file": "props/manhole_cover.glb",
+    "source": "https://polyhaven.com/a/water_manhole_cover",
+    "download": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/water_manhole_cover/water_manhole_cover_1k.gltf",
+    "author": "Poly Haven",
+    "license": "CC0-1.0",
+    "source_sha256": "9d692740cb6e70cee977a6ccb54a270271b81250b47468e9ef6387bd58215cf9",
+    "sha256": "b617db6f71f9d702ad3d7717fe05e373b0448dd8ffb20827045618a02432a0a3"
+  },
+  {
+    "file": "props/old_tyre.glb",
+    "source": "https://polyhaven.com/a/old_tyre",
+    "download": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/old_tyre/old_tyre_1k.gltf",
+    "author": "Poly Haven",
+    "license": "CC0-1.0",
+    "source_sha256": "ba7b417eb3dc747c356ac3cd1f125754755684eb664737a9f1fc9e490c0b766e",
+    "sha256": "b18c4eb86316f1026710ccc1e6e0d59aa7a4518c2477b026ed1dddcc90eb5440"
+  },
+  {
+    "file": "props/road_barrier.glb",
+    "source": "https://polyhaven.com/a/concrete_road_barrier",
+    "download": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/concrete_road_barrier/concrete_road_barrier_1k.gltf",
+    "author": "Poly Haven",
+    "license": "CC0-1.0",
+    "source_sha256": "c371e87d303fff3f0c9fbe88520f7837514364e5c66aac3244e115ffa673d061",
+    "sha256": "33e15a13d3df756ad0bc3540fcd255696b7299ce394d936783306cccf5e92028"
+  },
+  {
+    "file": "props/street_bench.glb",
+    "source": "https://polyhaven.com/a/modular_street_seating",
+    "download": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/modular_street_seating/modular_street_seating_1k.gltf",
+    "author": "Poly Haven",
+    "license": "CC0-1.0",
+    "source_sha256": "ae0c5b89927446dd3c3dc8fc021c5a6042448b785f340affaa132307d8a7b18d",
+    "sha256": "682808cd8052faf46bfbdff3e4864a607624371a585b1cd6291d8a5e6ddf58ac"
+  },
+  {
+    "file": "props/street_lamp.glb",
+    "source": "https://polyhaven.com/a/street_lamp_01",
+    "download": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/street_lamp_01/street_lamp_01_1k.gltf",
+    "author": "Poly Haven",
+    "license": "CC0-1.0",
+    "source_sha256": "5d0358ede168b5e04547780b99d8e6d651cbe644e468e67cb505019047cbd5c8",
+    "sha256": "e7321aec1aa5b41fc7b7fe97bb3c524c44e6836c8b61635879b6bcb5c1f58704"
+  },
+  {
+    "file": "props/trash_can.glb",
+    "source": "https://polyhaven.com/a/metal_trash_can",
+    "download": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/metal_trash_can/metal_trash_can_1k.gltf",
+    "author": "Poly Haven",
+    "license": "CC0-1.0",
+    "source_sha256": "ccdc55ecfe43db2174c9257891e92551882a874564bb9a7908cafc5268b46c0c",
+    "sha256": "b802909e0919dec88b9a480700f6ee2a82c86746a64ae2df5ed43558657dfba8"
+  },
+  {
+    "file": "props/utility_box.glb",
+    "source": "https://polyhaven.com/a/utility_box_01",
+    "download": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/utility_box_01/utility_box_01_1k.gltf",
+    "author": "Poly Haven",
+    "license": "CC0-1.0",
+    "source_sha256": "5b9f8c45f2640c9dd831dc3450529e45b24c987208ddcf73010fe717ce8c454e",
+    "sha256": "da46e47a017a94e78360c1d2af38bdbdc69b614b3506a7729bfe97e2e5577656"
+  },
+  {
+    "file": "trees/commontree_1.glb",
+    "source": "https://quaternius.com/packs/stylizednaturemegakit.html",
+    "download": "Stylized Nature MegaKit[Standard].zip",
+    "source_sha256": "298f6732b872e4cf7b30e6e7abf9641c7f6dc6b326df37ac089533ed7e3d58c9",
+    "author": "Quaternius",
+    "license": "CC0-1.0",
+    "sha256": "ab0ca852beab0c56d774cb93b93d7732b9786bdf66e3714d3066597b70b1e5fd"
+  },
+  {
+    "file": "trees/commontree_2.glb",
+    "source": "https://quaternius.com/packs/stylizednaturemegakit.html",
+    "download": "Stylized Nature MegaKit[Standard].zip",
+    "source_sha256": "298f6732b872e4cf7b30e6e7abf9641c7f6dc6b326df37ac089533ed7e3d58c9",
+    "author": "Quaternius",
+    "license": "CC0-1.0",
+    "sha256": "14617c5e79c806193217be5bdacbf4de3ecb428d276ea64c07207fbed4e26b1e"
+  },
+  {
+    "file": "trees/commontree_3.glb",
+    "source": "https://quaternius.com/packs/stylizednaturemegakit.html",
+    "download": "Stylized Nature MegaKit[Standard].zip",
+    "source_sha256": "298f6732b872e4cf7b30e6e7abf9641c7f6dc6b326df37ac089533ed7e3d58c9",
+    "author": "Quaternius",
+    "license": "CC0-1.0",
+    "sha256": "91a1be25c91cdbfca54110f21ad761d4749d50c9e7595ecd540fb7877bdfef26"
+  },
+  {
+    "file": "trees/commontree_4.glb",
+    "source": "https://quaternius.com/packs/stylizednaturemegakit.html",
+    "download": "Stylized Nature MegaKit[Standard].zip",
+    "source_sha256": "298f6732b872e4cf7b30e6e7abf9641c7f6dc6b326df37ac089533ed7e3d58c9",
+    "author": "Quaternius",
+    "license": "CC0-1.0",
+    "sha256": "641951b1460e0399293917b42fdf4dbacba9cb2edb8bd16ca952acb4a5971164"
+  },
+  {
+    "file": "trees/commontree_5.glb",
+    "source": "https://quaternius.com/packs/stylizednaturemegakit.html",
+    "download": "Stylized Nature MegaKit[Standard].zip",
+    "source_sha256": "298f6732b872e4cf7b30e6e7abf9641c7f6dc6b326df37ac089533ed7e3d58c9",
+    "author": "Quaternius",
+    "license": "CC0-1.0",
+    "sha256": "d610aa67a1afe148e4c98f5dac0901f783608a0dcbc272f13bcbded29a928ea3"
+  },
+  {
+    "file": "trees/pine_1.glb",
+    "source": "https://quaternius.com/packs/stylizednaturemegakit.html",
+    "download": "Stylized Nature MegaKit[Standard].zip",
+    "source_sha256": "298f6732b872e4cf7b30e6e7abf9641c7f6dc6b326df37ac089533ed7e3d58c9",
+    "author": "Quaternius",
+    "license": "CC0-1.0",
+    "sha256": "8e101ce0f7c4321ecf79b794aa76d048294a0c9c1aca2b8336af8e68c06c321d"
+  },
+  {
+    "file": "trees/pine_2.glb",
+    "source": "https://quaternius.com/packs/stylizednaturemegakit.html",
+    "download": "Stylized Nature MegaKit[Standard].zip",
+    "source_sha256": "298f6732b872e4cf7b30e6e7abf9641c7f6dc6b326df37ac089533ed7e3d58c9",
+    "author": "Quaternius",
+    "license": "CC0-1.0",
+    "sha256": "504c78e9af39b981a9bf25ac10e621ecb765bd182c3683b96411823b5c23d22a"
+  },
+  {
+    "file": "trees/pine_3.glb",
+    "source": "https://quaternius.com/packs/stylizednaturemegakit.html",
+    "download": "Stylized Nature MegaKit[Standard].zip",
+    "source_sha256": "298f6732b872e4cf7b30e6e7abf9641c7f6dc6b326df37ac089533ed7e3d58c9",
+    "author": "Quaternius",
+    "license": "CC0-1.0",
+    "sha256": "c06a34f72e9e2bcfa5bc02d211ea909ec4208ca43b5da2e0880e991d6278e7ee"
+  },
+  {
+    "file": "trees/pine_4.glb",
+    "source": "https://quaternius.com/packs/stylizednaturemegakit.html",
+    "download": "Stylized Nature MegaKit[Standard].zip",
+    "source_sha256": "298f6732b872e4cf7b30e6e7abf9641c7f6dc6b326df37ac089533ed7e3d58c9",
+    "author": "Quaternius",
+    "license": "CC0-1.0",
+    "sha256": "d5e3c8958aea2484ba265a5ebecc4a49eb634f2b373b462e3916c377b4ea0cab"
+  },
+  {
+    "file": "trees/tree_island_a.glb",
+    "source": "https://polyhaven.com/a/island_tree_01",
+    "download": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/island_tree_01/island_tree_01_1k.gltf",
+    "author": "Poly Haven",
+    "license": "CC0-1.0",
+    "source_sha256": "78e905a40670bfabb2760601d4d9a6c17193a50d68e6271c66893eb7bd75906d",
+    "sha256": "a6017133c4fefa5d2853aa22a360d5976637983bc316ddacaa21ae48ef07160f"
+  },
+  {
+    "file": "trees/tree_island_b.glb",
+    "source": "https://polyhaven.com/a/island_tree_02",
+    "download": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/island_tree_02/island_tree_02_1k.gltf",
+    "author": "Poly Haven",
+    "license": "CC0-1.0",
+    "source_sha256": "d8c5d9ead41cdbef91a648f40ff60470faa19eb3a7010e59e44cb1a01250f75d",
+    "sha256": "52c83453b5326bd8a8a0504d18319b2d945a5e2ccb0086ba602f58c5c9c1da03"
+  },
+  {
+    "file": "trees/tree_island_c.glb",
+    "source": "https://polyhaven.com/a/island_tree_03",
+    "download": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/island_tree_03/island_tree_03_1k.gltf",
+    "author": "Poly Haven",
+    "license": "CC0-1.0",
+    "source_sha256": "5efbe24ad6fc769db55ac771eec7a2ee7aa389c5667656f279d0743e455ef04a",
+    "sha256": "15cccaa41cd3b4ec5ce6006f42a4e5cb539a53eda085f488e87403f5f6d2d4d0"
+  },
+  {
+    "file": "trees/tree_island_dense.glb",
+    "source": "https://polyhaven.com/a/island_tree_01",
+    "download": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/island_tree_01/island_tree_01_1k.gltf",
+    "author": "Poly Haven",
+    "license": "CC0-1.0",
+    "source_sha256": "78e905a40670bfabb2760601d4d9a6c17193a50d68e6271c66893eb7bd75906d",
+    "sha256": "d0fd5ec7c6b7ccd8e1a53207d6daee2c9782088f97853d1331fdfe59dd25aabf"
+  },
+  {
+    "file": "trees/tree_island_slim.glb",
+    "source": "https://polyhaven.com/a/island_tree_03",
+    "download": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/island_tree_03/island_tree_03_1k.gltf",
+    "author": "Poly Haven",
+    "license": "CC0-1.0",
+    "source_sha256": "5efbe24ad6fc769db55ac771eec7a2ee7aa389c5667656f279d0743e455ef04a",
+    "sha256": "db07878a66ba1fcc27e7a3ad09418f69ab922bda963f38277589193af8866695"
+  },
+  {
+    "file": "trees/tree_island_wide.glb",
+    "source": "https://polyhaven.com/a/island_tree_02",
+    "download": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/island_tree_02/island_tree_02_1k.gltf",
+    "author": "Poly Haven",
+    "license": "CC0-1.0",
+    "source_sha256": "d8c5d9ead41cdbef91a648f40ff60470faa19eb3a7010e59e44cb1a01250f75d",
+    "sha256": "abbcce14202612df316a775affed602ffc0141f68899068d376612f6700ba1fa"
+  },
+  {
+    "file": "trees/tree_jacaranda.glb",
+    "source": "https://polyhaven.com/a/jacaranda_tree",
+    "download": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/jacaranda_tree/jacaranda_tree_1k.gltf",
+    "author": "Poly Haven",
+    "license": "CC0-1.0",
+    "source_sha256": "ba4aa8ab4c3e3741ce3699604d6ec1607cd6b126ae2d32abbcc0d98e8edb3be4",
+    "sha256": "84ec513c6138a497f4baa818f428e418cf564581156c2b97bde9a3193bd87078"
+  },
+  {
+    "file": "trees/tree_jacaranda_airy.glb",
+    "source": "https://polyhaven.com/a/jacaranda_tree",
+    "download": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/jacaranda_tree/jacaranda_tree_1k.gltf",
+    "author": "Poly Haven",
+    "license": "CC0-1.0",
+    "source_sha256": "ba4aa8ab4c3e3741ce3699604d6ec1607cd6b126ae2d32abbcc0d98e8edb3be4",
+    "sha256": "121a993c985f5878a17d3d5277dc92d739851a9e907c5462c725e5df27d2796a"
+  },
+  {
+    "file": "trees/tree_quiver_a.glb",
+    "source": "https://polyhaven.com/a/quiver_tree_01",
+    "download": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/quiver_tree_01/quiver_tree_01_1k.gltf",
+    "author": "Poly Haven",
+    "license": "CC0-1.0",
+    "source_sha256": "aa6885a0fe43b274584851b0947e2209dc64afce1d20a75a1567e790a12d0722",
+    "sha256": "1fcac8cca605ea9f08f9aee559cbbb8b4af811b011ab6ed24d61f0eccb007f18"
+  },
+  {
+    "file": "trees/tree_quiver_b.glb",
+    "source": "https://polyhaven.com/a/quiver_tree_02",
+    "download": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/quiver_tree_02/quiver_tree_02_1k.gltf",
+    "author": "Poly Haven",
+    "license": "CC0-1.0",
+    "source_sha256": "c92ea2f60defaa9c134f43ac606bb7564ade348f92b546ba91c87bc6365d1a56",
+    "sha256": "1c9fff368dad9528faac568094907c1905cd0bbc819f8fd2da41d5c1cef9c0b6"
+  },
+  {
+    "file": "trees/tree_small.glb",
+    "source": "https://polyhaven.com/a/tree_small_02",
+    "download": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/tree_small_02/tree_small_02_1k.gltf",
+    "author": "Poly Haven",
+    "license": "CC0-1.0",
+    "source_sha256": "3062a709614c05b80fdc1e56583998bc3cb1027b0d52f956c8ecfb882ff8ca6d",
+    "sha256": "5a51510f5777421d95b4223f0f072c69956a4daaab5d65b5eaa9038cb841f693"
+  },
+  {
+    "file": "trees/tree_small_open.glb",
+    "source": "https://polyhaven.com/a/tree_small_02",
+    "download": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/tree_small_02/tree_small_02_1k.gltf",
+    "author": "Poly Haven",
+    "license": "CC0-1.0",
+    "source_sha256": "3062a709614c05b80fdc1e56583998bc3cb1027b0d52f956c8ecfb882ff8ca6d",
+    "sha256": "a7e1ec407763bf61aab8a835b5bd2516a6160ce9409c20391d2f621dced475b4"
+  },
+  {
+    "file": "trees/twistedtree_1.glb",
+    "source": "https://quaternius.com/packs/stylizednaturemegakit.html",
+    "download": "Stylized Nature MegaKit[Standard].zip",
+    "source_sha256": "298f6732b872e4cf7b30e6e7abf9641c7f6dc6b326df37ac089533ed7e3d58c9",
+    "author": "Quaternius",
+    "license": "CC0-1.0",
+    "sha256": "31c7f0ec727bbe8e5d7862f79b4a39dcefb4b4911f67f5e2a0a201c01d874eed"
+  },
+  {
+    "file": "trees/twistedtree_2.glb",
+    "source": "https://quaternius.com/packs/stylizednaturemegakit.html",
+    "download": "Stylized Nature MegaKit[Standard].zip",
+    "source_sha256": "298f6732b872e4cf7b30e6e7abf9641c7f6dc6b326df37ac089533ed7e3d58c9",
+    "author": "Quaternius",
+    "license": "CC0-1.0",
+    "sha256": "d74ca649c0b2a10018525b69f668ac114995e6fc8674b22b5ff90909ee07f82d"
+  },
+  {
+    "file": "trees/twistedtree_3.glb",
+    "source": "https://quaternius.com/packs/stylizednaturemegakit.html",
+    "download": "Stylized Nature MegaKit[Standard].zip",
+    "source_sha256": "298f6732b872e4cf7b30e6e7abf9641c7f6dc6b326df37ac089533ed7e3d58c9",
+    "author": "Quaternius",
+    "license": "CC0-1.0",
+    "sha256": "b965c6ae15ce16ad6e951ad5abc1a6d28d2da3c794ed238860e378e72802d3db"
+  },
+  {
+    "file": "vegetation/bush_common_flowers.glb",
+    "source": "https://quaternius.com/packs/stylizednaturemegakit.html",
+    "download": "Stylized Nature MegaKit[Standard].zip",
+    "source_sha256": "298f6732b872e4cf7b30e6e7abf9641c7f6dc6b326df37ac089533ed7e3d58c9",
+    "author": "Quaternius",
+    "license": "CC0-1.0",
+    "sha256": "c8910cd074f6d7141c078dd0be2dd01ae8e4c6369a248ede1de2104adec99563"
+  },
+  {
+    "file": "vegetation/fern_1.glb",
+    "source": "https://quaternius.com/packs/stylizednaturemegakit.html",
+    "download": "Stylized Nature MegaKit[Standard].zip",
+    "source_sha256": "298f6732b872e4cf7b30e6e7abf9641c7f6dc6b326df37ac089533ed7e3d58c9",
+    "author": "Quaternius",
+    "license": "CC0-1.0",
+    "sha256": "13b12a2029cb38125cbdea1d86ff3d300f68b611ace6a2e61ed09218c8114638"
+  },
+  {
+    "file": "vegetation/flower_3_group.glb",
+    "source": "https://quaternius.com/packs/stylizednaturemegakit.html",
+    "download": "Stylized Nature MegaKit[Standard].zip",
+    "source_sha256": "298f6732b872e4cf7b30e6e7abf9641c7f6dc6b326df37ac089533ed7e3d58c9",
+    "author": "Quaternius",
+    "license": "CC0-1.0",
+    "sha256": "7dddefa0b59fe764cf72e1fd79adf1ceb33d9f0c64749cc6efa11e739b77bf7d"
+  },
+  {
+    "file": "vegetation/flower_4_group.glb",
+    "source": "https://quaternius.com/packs/stylizednaturemegakit.html",
+    "download": "Stylized Nature MegaKit[Standard].zip",
+    "source_sha256": "298f6732b872e4cf7b30e6e7abf9641c7f6dc6b326df37ac089533ed7e3d58c9",
+    "author": "Quaternius",
+    "license": "CC0-1.0",
+    "sha256": "07818cece5422b2eeee3c08f7e07ec1cb33976c2492f76a35b7c374a75600772"
+  },
+  {
+    "file": "vegetation/grass_common_short.glb",
+    "source": "https://quaternius.com/packs/stylizednaturemegakit.html",
+    "download": "Stylized Nature MegaKit[Standard].zip",
+    "source_sha256": "298f6732b872e4cf7b30e6e7abf9641c7f6dc6b326df37ac089533ed7e3d58c9",
+    "author": "Quaternius",
+    "license": "CC0-1.0",
+    "sha256": "7c6264951edc7d796568c6aaa3b7a29c7c1ce5a8b0452cf12ece262b0234ba56"
+  },
+  {
+    "file": "vegetation/grass_wispy_tall.glb",
+    "source": "https://quaternius.com/packs/stylizednaturemegakit.html",
+    "download": "Stylized Nature MegaKit[Standard].zip",
+    "source_sha256": "298f6732b872e4cf7b30e6e7abf9641c7f6dc6b326df37ac089533ed7e3d58c9",
+    "author": "Quaternius",
+    "license": "CC0-1.0",
+    "sha256": "8c16e516832b8f77829d8d99cec01aad74cfa7740e27fcc7a3179f30bc118658"
+  },
+  {
+    "file": "vegetation/rock_medium_1.glb",
+    "source": "https://quaternius.com/packs/stylizednaturemegakit.html",
+    "download": "Stylized Nature MegaKit[Standard].zip",
+    "source_sha256": "298f6732b872e4cf7b30e6e7abf9641c7f6dc6b326df37ac089533ed7e3d58c9",
+    "author": "Quaternius",
+    "license": "CC0-1.0",
+    "sha256": "17f0988c1d1911d02776a08898cea8dbc23dec50f7feb74dd3f366a10d1ba7bf"
+  },
+  {
+    "file": "vegetation/rock_medium_2.glb",
+    "source": "https://quaternius.com/packs/stylizednaturemegakit.html",
+    "download": "Stylized Nature MegaKit[Standard].zip",
+    "source_sha256": "298f6732b872e4cf7b30e6e7abf9641c7f6dc6b326df37ac089533ed7e3d58c9",
+    "author": "Quaternius",
+    "license": "CC0-1.0",
+    "sha256": "bca80e6b0a84bdcc43bb19d024ea5898d0b548f9934a48dfd43da1cf9704a6b8"
+  },
+  {
+    "file": "vegetation/rock_medium_3.glb",
+    "source": "https://quaternius.com/packs/stylizednaturemegakit.html",
+    "download": "Stylized Nature MegaKit[Standard].zip",
+    "source_sha256": "298f6732b872e4cf7b30e6e7abf9641c7f6dc6b326df37ac089533ed7e3d58c9",
+    "author": "Quaternius",
+    "license": "CC0-1.0",
+    "sha256": "8decc98d2c3e3a6c0c911587b29010c3724bd9cdba8d89243dfa585b8ebe850f"
+  }
+]
