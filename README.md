@@ -13,6 +13,8 @@ Open the local address printed by Vite (normally `http://127.0.0.1:5173`). Keep 
 
 Controls: **WASD** move/drive, **Shift** run, drag the mouse on the game view to look around, **T** talk to a nearby character, **E** use the highlighted mission station, **F** enter or exit the sedan, and **Esc** pause/close a conversation.
 
+Use **Settings → Edit Layout** to place characters, props, and cameras. **Save Layout** writes the shared default to `layout.json` in the game project so browsers using this game server load the same transforms; editing an object field also syncs the layout automatically. The current 2-meter model normalization is unchanged by this update.
+
 ## Local speech
 
 - **Speech input:** Shruti Malayalam + English runs in the browser through ONNX. Press the microphone button in a conversation. On first use the browser downloads the small model; after that it is cached locally. Only the transcript text is sent to the local Ollama endpoint. The model is intended to handle Malayalam, English, and code-switched Malayalam-English.
@@ -30,6 +32,7 @@ Controls: **WASD** move/drive, **Shift** run, drag the mouse on the game view to
 ## Files and asset credits
 
 - `public/maps/map_game_ready.glb` is the map you supplied.
+- `public/assets/characters/sharu.glb`, `sharu-mom.glb`, `Bhishma.glb`, and `manager_lion_animated.glb.glb` are the character models you supplied. Their rigs receive procedural walk cycles because the files contain no animation clips.
 - `public/assets/characters/` uses the supplied Quaternius character GLBs. Their included license notice states CC0 1.0.
 - `public/assets/cars/` uses the supplied Kenney sedan, taxi, and hatchback. Kenney's included notice states CC0.
 - `public/assets/licenses/manifest.json` records the asset origins and licenses. The user-supplied Porsche model marked `unknown - user supplied` was not copied into this game.

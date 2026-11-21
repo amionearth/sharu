@@ -95,11 +95,17 @@ let editorSelection = null;
 let editorSelectionBox = null;
 let editorCameraDistance = 24;
 let gameCameraDistance = 2;
+let editorDirty = false;
 const editorCameraTarget = new THREE.Vector3(0, 1, 0);
 let juiceShopGroup = null;
 let defaultLayout = null;
 let savedLayout = readLayout();
 const bootData = readSave();
+let globalLayoutReady = false;
+let layoutSaveTimer = 0;
+const gravity = 24;
+const groundRay = new THREE.Raycaster();
+let groundMeshes = [];
 
 const player = {
   group: new THREE.Group(),
@@ -140,10 +146,39 @@ function readLayout() {
   try { return JSON.parse(localStorage.getItem('sheru-kochi-layout') || 'null'); } catch { return null; }
 }
 
+function writeLocal(key, value) {
+  try { window.localStorage?.setItem(key, value); } catch { /* Shared project storage remains available if browser storage is disabled. */ }
+}
+
 function saveGame(showMessage = true) {
   const snapshot = { version: 1, storyStep: currentMissionStep, cash, missionComplete, mode: gameMode, player: [player.position.x, player.position.y, player.position.z], at: Date.now() };
-  localStorage.setItem('sheru-kochi-save', JSON.stringify(snapshot));
+  writeLocal('sheru-kochi-save', JSON.stringify(snapshot));
   if (showMessage) toast('Progress saved on this device.');
+}
+
+async function loadGlobalLayout() {
+  try {
+    const response = await fetch('/api/layout', { cache: 'no-store' });
+    if (!response.ok) return;
+    const { layout } = await response.json();
+    if (layout?.objects) savedLayout = layout;
+    else if (savedLayout?.objects) {
+      await fetch('/api/layout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ layout: savedLayout }) });
+    }
+    if (savedLayout?.objects) {
+      writeLocal('sheru-kochi-layout', JSON.stringify(savedLayout));
+      applyLayout(savedLayout);
+    }
+    globalLayoutReady = true;
+  } catch (error) { console.warn('Shared layout unavailable; using this browser’s saved layout.', error); }
+}
+
+function scheduleGlobalLayoutSave() {
+  if (!editing) return;
+  editorDirty = true;
+  if (!globalLayoutReady) return;
+  clearTimeout(layoutSaveTimer);
+  layoutSaveTimer = window.setTimeout(() => saveEditorLayout(false), 450);
 }
 
 function makeMat(color, roughness = 0.82, opts = {}) {
@@ -247,14 +282,21 @@ function addActor(id, data, model, position, { playerActor = false, wander = 0 }
     }
     if (actions.idle) actions.idle.play();
   }
-  const actor = { id, data, group, body, bodyHeight, mixer, actions, spawn: position.clone(), wander, wanderTarget: position.clone(), wanderWait: Math.random() * 2 };
+  const bones = {};
+  body.traverse(node => {
+    if (!node.isBone) return;
+    const key = node.name.replace(/^mixamorig:/i, '').toLowerCase();
+    if (['leftupleg','rightupleg','leftarm','rightarm','leftleg','rightleg','hips'].includes(key)) bones[key] = { node, base: node.rotation.clone() };
+  });
+  const actor = { id, data, group, body, bodyHeight, mixer, actions, bones, gait: Math.random()*Math.PI*2, playerActor, spawn: position.clone(), wander, wanderTarget: position.clone(), wanderWait: Math.random() * 2 };
   actors.set(id, actor);
   if (!playerActor) npcActors.push(actor);
   return actor;
 }
 
 function setPlayerAnimation(name) {
-  if (activePlayerAction === name || !playerMixer || !playerActions[name]) return;
+  if (!playerMixer || !playerActions[name]) return;
+  if (activePlayerAction === name) return;
   playerActions[name]?.reset().fadeIn(0.2).play();
   playerActions[activePlayerAction]?.fadeOut(0.18);
   activePlayerAction = name;
@@ -273,11 +315,12 @@ function addShopMarker(position, label, hotkey = 'E', color = '#f2bf6d') {
 
 function buildWorldActors() {
   const model = id => assets.get(`characters/${id}`);
-  const sheru = addActor('sheru', { name: 'Sheru' }, model('player.glb'), player.position, { playerActor: true });
+  const sheru = addActor('sheru', { name: 'Sharu' }, model('sharu.glb'), player.position, { playerActor: true });
   player.group = sheru.group; player.mesh = sheru.body; playerMixer = sheru.mixer; playerActions = sheru.actions;
-  const mother = addActor('mother', npcDirectory.mother, model('women-0.glb'), stationPositions.mother.clone());
+  const mother = addActor('mother', npcDirectory.mother, model('sharu-mom.glb'), stationPositions.mother.clone());
   const customer = addActor('customer', npcDirectory.customer, model('men-0.glb'), stationPositions.customer.clone());
-  const jomon = addActor('jomon', npcDirectory.jomon, model('men-1.glb'), new THREE.Vector3(-6,0,8), { wander: 2.8 });
+  const jomon = addActor('jomon', npcDirectory.jomon, model('manager_lion_animated.glb.glb'), new THREE.Vector3(-6,0,8), { wander: 2.8 });
+  addActor('bhishma', npcDirectory.bhishma, model('Bhishma.glb'), new THREE.Vector3(44,0,30), { wander: 1.1 });
   addActor('latha', npcDirectory.latha, model('women-1.glb'), new THREE.Vector3(-13,0,-11), { wander: 2.0 });
   addActor('raghavan', npcDirectory.raghavan, model('men-2.glb'), new THREE.Vector3(-21,0,10), { wander: 1.4 });
   addActor('shibu', npcDirectory.shibu, model('men-0.glb'), new THREE.Vector3(31,0,14), { wander: 2.0 });
@@ -290,7 +333,7 @@ function buildWorldActors() {
     scene.add(actor.nameTag);
   }
   const sheruActor = actors.get('sheru');
-  sheruActor.nameTag = makeNameTag('SHERU'); scene.add(sheruActor.nameTag);
+  sheruActor.nameTag = makeNameTag('SHARU'); scene.add(sheruActor.nameTag);
   // The vehicle meshes are Kenney CC0 models; no unknown-license sports-car model is used.
   const carGltf = assets.get('cars/sedan.glb');
   currentCar = makeVehicle(carGltf, new THREE.Vector3(-9,0,-5));
@@ -334,10 +377,10 @@ function applyLayout(layout) {
   }
 }
 
-function setObjectTransform(id, position, rotationY = 0, scale = 1) {
+function setObjectTransform(id, position, rotationY = 0, scale = null) {
   const item = getEditorObjects().get(id);
   if (!item) return;
-  item.group.position.fromArray(position); item.group.rotation.y = rotationY; item.group.scale.setScalar(scale);
+  item.group.position.fromArray(position); item.group.rotation.y = rotationY; if(Number.isFinite(scale)) item.group.scale.setScalar(scale);
   if (item.actor) { item.actor.spawn.copy(item.group.position); item.actor.wanderTarget.copy(item.group.position); if (id === 'sheru') player.position.copy(item.group.position); }
 }
 
@@ -345,10 +388,11 @@ function stagePositions() {
   const ids = [...actors.keys()];
   ids.forEach((id, index) => {
     const col = index % 5, row = Math.floor(index / 5);
-    setObjectTransform(id, [(col-2)*5,0,row*5], 0, 1);
+    const item=getEditorObjects().get(id);
+    setObjectTransform(id, [(col-2)*5,0,row*5], item?.group.rotation.y ?? 0);
   });
-  setObjectTransform('sedan',[15,0,5],0,1);
-  setObjectTransform('juice-shop',[0,0,-15],0,1);
+  setObjectTransform('sedan',[15,0,5]);
+  setObjectTransform('juice-shop',[0,0,-15]);
 }
 
 function updateEditorFields() {
@@ -374,25 +418,36 @@ function enterEditing() {
   if (!defaultLayout) defaultLayout = { objects: readObjectTransforms() };
   if (savedLayout?.objects) applyLayout(savedLayout); else stagePositions();
   editorObjects = getEditorObjects();
+  editorDirty = false;
   const select = $('#editor-object'); select.replaceChildren();
   for (const item of editorObjects.values()) { const option=document.createElement('option'); option.value=item.id; option.textContent=item.label; select.append(option); }
   selectEditorObject('sheru');
   const cameraData = savedLayout?.camera || {};
-  editorCameraDistance = 24; gameCameraDistance = cameraData.gameDistance ?? 2;
+  editorCameraDistance = cameraData.studioDistance ?? 24; gameCameraDistance = cameraData.gameDistance ?? 2;
   $('#edit-camera').value = String(editorCameraDistance); $('#edit-camera-value').textContent = String(editorCameraDistance);
   $('#edit-game-camera').value = String(gameCameraDistance); $('#edit-game-camera-value').textContent = String(gameCameraDistance);
   cameraYaw = cameraData.yaw ?? 0.25; cameraPitch = cameraData.pitch ?? 0.25;
-  editorCameraTarget.set(0,1,0); cameraTarget.copy(editorCameraTarget);
-  $('#editor-status').textContent = savedLayout ? 'Loaded your saved layout. Select and edit any item.' : 'Arrange the characters, shop, and car. Save to use this layout in both modes.';
+  editorCameraTarget.fromArray(cameraData.studioTarget || [0,1,0]); cameraTarget.copy(editorCameraTarget);
+  $('#editor-status').textContent = savedLayout ? 'Loaded the shared saved layout. Changes sync to this game project.' : 'Arrange the characters, shop, and car. Save to share the default layout with every browser.';
 }
 
-function saveEditorLayout() {
-  const layout = { version: 1, objects: readObjectTransforms(), camera: { gameDistance: gameCameraDistance, yaw: cameraYaw, pitch: cameraPitch } };
-  localStorage.setItem('sheru-kochi-layout', JSON.stringify(layout)); savedLayout = layout;
-  $('#editor-status').textContent = 'Layout saved on this device. Story and Open World will use it.';
+async function saveEditorLayout(showStatus = true) {
+  const layout = { version: 1, objects: readObjectTransforms(), camera: { gameDistance: gameCameraDistance, studioDistance: editorCameraDistance, studioTarget: editorCameraTarget.toArray(), yaw: cameraYaw, pitch: cameraPitch } };
+  writeLocal('sheru-kochi-layout', JSON.stringify(layout)); savedLayout = layout;
+  editorDirty = false;
+  if (showStatus) $('#editor-status').textContent = 'Saving shared project layout…';
+  try {
+    const response = await fetch('/api/layout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ layout }) });
+    if (!response.ok) throw new Error('Shared save failed');
+    if (showStatus) $('#editor-status').textContent = 'Saved as the default layout for every browser using this game server.';
+  } catch {
+    if (showStatus) $('#editor-status').textContent = 'Saved in this browser. Start the game server to share the layout globally.';
+  }
 }
 
 function exitEditing() {
+  clearTimeout(layoutSaveTimer);
+  if (editorDirty) void saveEditorLayout(false);
   editing = false; $('#editor-panel').classList.add('hidden'); $('#title-screen').classList.remove('hidden');
   mapRoot.visible = true; editorGrid.visible = false; titleOpen = true;
   if (editorSelectionBox) scene.remove(editorSelectionBox); editorSelectionBox = null; editorSelection = null;
@@ -521,7 +576,7 @@ function finishCutscene() {
 }
 
 function startMode(mode) {
-  editing = false; editorGrid.visible = false; mapRoot.visible = true; $('#editor-panel').classList.add('hidden');
+  editing = false; editorGrid.visible = false; mapRoot.visible = true; $('#editor-panel').classList.add('hidden'); $('#settings-panel').classList.add('hidden');
   applyLayout(savedLayout); gameCameraDistance = savedLayout?.camera?.gameDistance ?? 2;
   cameraYaw = savedLayout?.camera?.yaw ?? 0.08; cameraPitch = savedLayout?.camera?.pitch ?? 0.25;
   player.group.visible = true; inCar = false;
@@ -710,17 +765,19 @@ async function toggleRecording() {
 function updateNpcWander(dt) {
   if (editing) return;
   for (const npc of npcActors) {
-    if (!npc.wander || activeNpc === npc) continue;
+    if (!npc.wander || activeNpc === npc) { updateActorRig(npc, false, dt); continue; }
     npc.wanderWait -= dt;
     if (npc.wanderWait <= 0 && npc.group.position.distanceTo(npc.wanderTarget) < 0.3) {
       npc.wanderTarget.copy(npc.spawn).add(new THREE.Vector3((Math.random()-.5)*npc.wander*2,0,(Math.random()-.5)*npc.wander*2));
       npc.wanderWait = 1.2 + Math.random()*3;
     }
     const delta = npc.wanderTarget.clone().sub(npc.group.position); delta.y=0;
-    if (delta.length() > 0.25) {
+    const moving = delta.length() > 0.25;
+    if (moving) {
       delta.normalize(); npc.group.position.addScaledVector(delta,dt*0.72); npc.group.rotation.y=Math.atan2(delta.x,delta.z); npc.actions.walk?.play();
     } else npc.actions.walk?.fadeOut(0.15);
     npc.mixer?.update(dt);
+    updateActorRig(npc, moving, dt, 2.2);
     if(npc.nameTag){npc.nameTag.position.set(npc.group.position.x,npc.group.position.y+npc.bodyHeight+0.6,npc.group.position.z)}
   }
 }
@@ -743,7 +800,7 @@ function updatePlayer(dt) {
     currentCar.group.position.z=THREE.MathUtils.clamp(currentCar.group.position.z,mapBounds.minZ,mapBounds.maxZ);
     player.position.copy(currentCar.group.position);
     if(Math.abs(carSpeed)>0.3) cameraYaw=THREE.MathUtils.damp(cameraYaw,currentCar.group.rotation.y,1.4,dt);
-    setPlayerAnimation('idle');
+    setPlayerAnimation('idle'); updateActorRig(actors.get('sheru'), false, dt);
     return;
   }
   moveVector.set(sideInput,0,-forwardInput);
@@ -758,8 +815,46 @@ function updatePlayer(dt) {
     player.group.rotation.y=Math.atan2(cameraForward.x,cameraForward.z);
     player.running=run;
     setPlayerAnimation(run?'run':'walk');
-  } else { player.running=false; setPlayerAnimation('idle'); }
+    updateActorRig(actors.get('sheru'), true, dt, run?10:7.4);
+  } else { player.running=false; setPlayerAnimation('idle'); updateActorRig(actors.get('sheru'), false, dt); }
   player.group.position.copy(player.position);
+}
+
+function updateActorRig(actor, moving, dt, speed = 3.4) {
+  if (!actor?.bones || actor.actions.walk || actor.actions.run) return;
+  actor.gait += dt * (moving ? speed : 2.2);
+  const swing = moving ? Math.sin(actor.gait) * (speed > 5 ? 0.58 : 0.42) : Math.sin(actor.gait) * 0.025;
+  const setX = (key, amount) => { const bone=actor.bones[key]; if(bone) bone.node.rotation.x=bone.base.x+amount; };
+  setX('leftupleg', swing); setX('rightupleg', -swing);
+  setX('leftleg', Math.max(0,-swing)*0.55); setX('rightleg', Math.max(0,swing)*0.55);
+  setX('leftarm', -swing*0.62); setX('rightarm', swing*0.62);
+  const hips=actor.bones.hips; if(hips) hips.node.position.y = (hips.base.y || 0) + (moving ? Math.abs(Math.sin(actor.gait*2))*0.035 : 0);
+}
+
+function groundHeightAt(x, z) {
+  if (!groundMeshes.length) return null;
+  groundRay.set(new THREE.Vector3(x, 500, z), new THREE.Vector3(0,-1,0));
+  groundRay.far = 1000;
+  const hits = groundRay.intersectObjects(groundMeshes, false);
+  const hit = hits.find(item => item.face && item.face.normal.clone().transformDirection(item.object.matrixWorld).y > 0.55);
+  return hit?.point.y ?? null;
+}
+
+function applyGrounding(actor, dt) {
+  if (!actor || editing) return;
+  actor.groundTimer = (actor.groundTimer ?? 0) - dt;
+  if (actor.groundTimer > 0) return;
+  actor.groundTimer = 0.12;
+  const ground = groundHeightAt(actor.group.position.x, actor.group.position.z);
+  if (ground == null) return;
+  const fallStep = 0.12;
+  if (actor.group.position.y <= ground) { actor.group.position.y=ground; actor.verticalVelocity=0; }
+  else {
+    actor.verticalVelocity=Math.max(-35,(actor.verticalVelocity||0)-gravity*fallStep);
+    actor.group.position.y=Math.max(ground,actor.group.position.y+actor.verticalVelocity*fallStep);
+    if(actor.group.position.y===ground) actor.verticalVelocity=0;
+  }
+  if (actor.playerActor) player.position.y = actor.group.position.y;
 }
 
 function updateInteractionPrompt() {
@@ -815,6 +910,8 @@ function animate(timestamp) {
   const dt=Math.min(clock.getDelta(),0.04); elapsed+=dt; frameTime+=dt;
   if (!paused) {
     updatePlayer(dt);
+    if (!inCar && !editing) applyGrounding(actors.get('sheru'), dt);
+    for (const actor of npcActors) applyGrounding(actor, dt);
     playerMixer?.update(dt);
     updateNpcWander(dt);
     updateCamera(dt);
@@ -832,6 +929,10 @@ async function loadWorld() {
     setLoad('Loading your map · 81 MB…', 2);
     const files = [
       ['map','/maps/map_game_ready.glb',2,74],
+      ['sharu.glb','/assets/characters/sharu.glb'],
+      ['sharu-mom.glb','/assets/characters/sharu-mom.glb'],
+      ['Bhishma.glb','/assets/characters/Bhishma.glb'],
+      ['manager_lion_animated.glb.glb','/assets/characters/manager_lion_animated.glb.glb'],
       ['player.glb','/assets/characters/player.glb'],
       ['men-0.glb','/assets/characters/men-0.glb'],
       ['men-1.glb','/assets/characters/men-1.glb'],
@@ -842,15 +943,18 @@ async function loadWorld() {
       ['sedan.glb','/assets/cars/sedan.glb'],
     ];
     const results=await Promise.all(files.map(async ([key,url,base,span])=>[key,await loadGLB(url,base||75,span||2)]));
-    for(const [key,gltf] of results) assets.set(key==='map'?'map':key.startsWith('men')||key.startsWith('women')||key==='player.glb'?`characters/${key}`:`cars/${key}`,gltf);
+    for(const [key,gltf] of results) assets.set(key==='map'?'map':key==='sedan.glb'?`cars/${key}`:`characters/${key}`,gltf);
     setLoad('Building the streets of Kochi…', 79);
     const gltf=assets.get('map');
     const map=gltf.scene;
     map.traverse(o=>{if(o.isMesh){o.receiveShadow=true;o.castShadow=false;o.frustumCulled=true;if(o.material){const materials=Array.isArray(o.material)?o.material:[o.material];for(const m of materials){if(m.map)m.map.colorSpace=THREE.SRGBColorSpace;m.side=THREE.DoubleSide}}}});
+    groundMeshes = [];
+    map.traverse(object => { if (object.isMesh && /island surface|road network|ground|terrain|walkable/i.test(object.name)) groundMeshes.push(object); });
     mapRoot.add(map);
     buildWorldActors();
     defaultLayout = { objects: readObjectTransforms() };
     applyLayout(savedLayout);
+    await loadGlobalLayout();
     worldLoaded=true;
     $('#loading-screen').classList.add('hidden');
     $('#title-screen').classList.remove('hidden');
@@ -876,6 +980,7 @@ async function checkLocalServices() {
 window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.6))});
 document.addEventListener('keydown',event=>{
   const key=event.key.toLowerCase();
+  if (key==='escape' && titleOpen && !$('#settings-panel').classList.contains('hidden')) { $('#settings-panel').classList.add('hidden'); return; }
   if (editing) {
     if (key==='escape') { exitEditing(); return; }
     if (event.target.matches('input,select')) return;
@@ -884,6 +989,7 @@ document.addEventListener('keydown',event=>{
     if (key==='s'||key==='arrowdown') editorCameraTarget.z += step;
     if (key==='a'||key==='arrowleft') editorCameraTarget.x -= step;
     if (key==='d'||key==='arrowright') editorCameraTarget.x += step;
+    scheduleGlobalLayoutSave();
     return;
   }
   if(['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright','shift',' '].includes(key)&&!event.target.matches('input')){keys.add(key);if(key===' ')event.preventDefault()}
@@ -906,13 +1012,15 @@ document.addEventListener('keyup',event=>keys.delete(event.key.toLowerCase()));
 window.addEventListener('blur',()=>keys.clear());
 canvas.addEventListener('pointerdown',event=>{pointerDown=true;lastPointer={x:event.clientX,y:event.clientY};canvas.setPointerCapture?.(event.pointerId)});
 canvas.addEventListener('pointerup',()=>{pointerDown=false;lastPointer=null});
-canvas.addEventListener('pointermove',event=>{if(!pointerDown||!lastPointer)return;cameraYaw-=(event.clientX-lastPointer.x)*0.003;cameraPitch=THREE.MathUtils.clamp(cameraPitch+(event.clientY-lastPointer.y)*0.0018,-0.1,0.72);lastPointer={x:event.clientX,y:event.clientY}});
+canvas.addEventListener('pointermove',event=>{if(!pointerDown||!lastPointer)return;cameraYaw-=(event.clientX-lastPointer.x)*0.003;cameraPitch=THREE.MathUtils.clamp(cameraPitch+(event.clientY-lastPointer.y)*0.0018,-0.1,0.72);lastPointer={x:event.clientX,y:event.clientY};if(editing)scheduleGlobalLayoutSave()});
 canvas.addEventListener('contextmenu',event=>event.preventDefault());
-canvas.addEventListener('wheel',event=>{if(!editing)return;event.preventDefault();editorCameraDistance=THREE.MathUtils.clamp(editorCameraDistance+Math.sign(event.deltaY)*1.5,8,55);$('#edit-camera').value=String(editorCameraDistance);$('#edit-camera-value').textContent=String(editorCameraDistance)},{passive:false});
+canvas.addEventListener('wheel',event=>{if(!editing)return;event.preventDefault();editorCameraDistance=THREE.MathUtils.clamp(editorCameraDistance+Math.sign(event.deltaY)*1.5,8,55);$('#edit-camera').value=String(editorCameraDistance);$('#edit-camera-value').textContent=String(editorCameraDistance);scheduleGlobalLayoutSave()},{passive:false});
 
 $('#start-story').onclick=()=>startMode('story');
 $('#start-free').onclick=()=>startMode('free');
-$('#start-edit').onclick=enterEditing;
+$('#open-settings').onclick=()=>$('#settings-panel').classList.remove('hidden');
+$('#close-settings').onclick=()=>$('#settings-panel').classList.add('hidden');
+$('#settings-edit').onclick=()=>{$('#settings-panel').classList.add('hidden');enterEditing()};
 $('#continue-game').onclick=()=>startMode('story');
 $('#skip-cutscene').onclick=()=>finishCutscene();
 $('#cutscene').addEventListener('click',event=>{if(event.target.id!=='skip-cutscene')advanceCutscene()});
@@ -935,13 +1043,14 @@ for (const id of ['edit-x','edit-y','edit-z','edit-yaw','edit-scale']) $('#'+id)
   group.position.set(n('edit-x'),n('edit-y'),n('edit-z'));
   group.rotation.y=THREE.MathUtils.degToRad(n('edit-yaw'));
   group.scale.setScalar(THREE.MathUtils.clamp(n('edit-scale',1),0.05,20));
+  scheduleGlobalLayoutSave();
   if(editorSelection.actor){editorSelection.actor.spawn.copy(group.position);editorSelection.actor.wanderTarget.copy(group.position);if(editorSelection.id==='sheru')player.position.copy(group.position);}
   if(editorSelection.id==='juice-shop')applyLayout({objects:{'juice-shop':{position:group.position.toArray()}}});
 });
-$('#edit-camera').addEventListener('input',event=>{editorCameraDistance=Number(event.target.value);$('#edit-camera-value').textContent=String(editorCameraDistance)});
-$('#edit-game-camera').addEventListener('input',event=>{gameCameraDistance=Number(event.target.value);$('#edit-game-camera-value').textContent=String(gameCameraDistance)});
+$('#edit-camera').addEventListener('input',event=>{editorCameraDistance=Number(event.target.value);$('#edit-camera-value').textContent=String(editorCameraDistance);scheduleGlobalLayoutSave()});
+$('#edit-game-camera').addEventListener('input',event=>{gameCameraDistance=Number(event.target.value);$('#edit-game-camera-value').textContent=String(gameCameraDistance);scheduleGlobalLayoutSave()});
 $('#save-layout').onclick=saveEditorLayout;
-$('#reset-layout').onclick=()=>{stagePositions();editorCameraDistance=24;gameCameraDistance=2;cameraYaw=0.25;cameraPitch=0.25;$('#edit-camera').value='24';$('#edit-camera-value').textContent='24';$('#edit-game-camera').value='2';$('#edit-game-camera-value').textContent='2';selectEditorObject(editorSelection?.id||'sheru');$('#editor-status').textContent='Staging layout reset. Save to keep these positions.';};
+$('#reset-layout').onclick=()=>{stagePositions();editorCameraDistance=24;gameCameraDistance=2;cameraYaw=0.25;cameraPitch=0.25;$('#edit-camera').value='24';$('#edit-camera-value').textContent='24';$('#edit-game-camera').value='2';$('#edit-game-camera-value').textContent='2';selectEditorObject(editorSelection?.id||'sheru');$('#editor-status').textContent='Stage positions reset. Character sizes are unchanged.';scheduleGlobalLayoutSave()};
 $('#editor-exit').onclick=exitEditing;
 
 loadWorld();

@@ -42,6 +42,7 @@ export const missionOne = {
 export const npcDirectory = {
   mother: { name: 'Amma', role: 'SHERU’S MOTHER · JUICE SHOP', initials: 'AM', model: 'women-0.glb', voice: 'female', opener: 'Counter clean aakkiyo, mone? Customer wait cheyyunnu.' },
   jomon: { name: 'Jomon', role: 'SHERU’S CHILDHOOD FRIEND', initials: 'JM', model: 'men-1.glb', voice: 'male', opener: 'Sheru, plan undu. Pakshe cash nee nokkanam.' },
+  bhishma: { name: 'Bhishma', role: 'SHARU’S FATHER’S RIGHT HAND', initials: 'BH', model: 'Bhishma.glb', voice: 'male', opener: 'Sharu sir, oru vishayam parayaanundu. Ithu kettittu panic aakaruthu.' },
   latha: { name: 'Latha', role: 'NEIGHBOURING SHOPKEEPER', initials: 'LT', model: 'women-1.glb', voice: 'female', opener: 'Sheru, ninte amma chodicha saadhanam konduvanno?' },
   raghavan: { name: 'Raghavan', role: 'TEA-SHOP OWNER', initials: 'RG', model: 'men-2.glb', voice: 'male', opener: 'Oru chaaya kudichittu para, entha vishesham?' },
   shibu: { name: 'Shibu', role: 'LOCAL MECHANIC', initials: 'SB', model: 'men-0.glb', voice: 'male', opener: 'Enikku ella bike-um sheriyakkaan ariyaam. Almost.' },
