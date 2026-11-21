@@ -5,6 +5,9 @@ import { openingCutscene, missionOne, npcDirectory } from './data/story.js';
 import './style.css';
 
 const $ = selector => document.querySelector(selector);
+const CHARACTER_HEIGHT_METERS = 2.0;
+const PLAYER_CAMERA_LOOK_HEIGHT_METERS = CHARACTER_HEIGHT_METERS * 0.55;
+const CUTSCENE_CAMERA_DISTANCE_METERS = 2.0;
 const canvas = $('#game-canvas');
 const loader = new GLTFLoader();
 const scene = new THREE.Scene();
@@ -19,7 +22,7 @@ renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.13;
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.type = THREE.PCFShadowMap;
 
 scene.add(new THREE.HemisphereLight('#e7f2e6', '#526054', 2.0));
 const sun = new THREE.DirectionalLight('#fff0c9', 2.6);
@@ -34,11 +37,15 @@ sun.shadow.bias = -0.0004;
 scene.add(sun);
 
 const mapRoot = new THREE.Group();
-mapRoot.name = 'Supplied Kochi map (Z-up to Three.js Y-up)';
-mapRoot.rotation.x = -Math.PI / 2;
+// The supplied GLB already rotates its Z-up map meshes into Three.js Y-up.
+// A second root rotation tips the island upright and hides the playable ground.
+mapRoot.name = 'Supplied Kochi map (source GLB orientation)';
 scene.add(mapRoot);
+const editorGrid = new THREE.GridHelper(100, 40, '#d9ad6d', '#536052');
+editorGrid.visible = false; scene.add(editorGrid);
 
-const clock = new THREE.Clock();
+const clock = new THREE.Timer();
+clock.connect(document);
 const raycaster = new THREE.Raycaster();
 const keys = new Set();
 const assets = new Map();
@@ -82,12 +89,22 @@ let currentMissionStep = 0;
 let cash = 0;
 let gameMode = 'story';
 let missionComplete = false;
+let editing = false;
+let editorObjects = new Map();
+let editorSelection = null;
+let editorSelectionBox = null;
+let editorCameraDistance = 24;
+let gameCameraDistance = 2;
+const editorCameraTarget = new THREE.Vector3(0, 1, 0);
+let juiceShopGroup = null;
+let defaultLayout = null;
+let savedLayout = readLayout();
 const bootData = readSave();
 
 const player = {
   group: new THREE.Group(),
   mesh: null,
-  position: new THREE.Vector3(4, 0, 4),
+  position: new THREE.Vector3(-3, 0, 10),
   velocityY: 0,
   speed: 7.4,
   running: false,
@@ -117,6 +134,10 @@ function loadGLB(url, percentBase, percentSpan) {
 
 function readSave() {
   try { return JSON.parse(localStorage.getItem('sheru-kochi-save') || '{}'); } catch { return {}; }
+}
+
+function readLayout() {
+  try { return JSON.parse(localStorage.getItem('sheru-kochi-layout') || 'null'); } catch { return null; }
 }
 
 function saveGame(showMessage = true) {
@@ -153,6 +174,7 @@ function addTextTexture(text, width = 1024, height = 256, foreground = '#f3d99c'
 
 function buildJuiceShop() {
   const shop = new THREE.Group();
+  juiceShopGroup = shop;
   shop.name = 'Amma’s Juice Shop · Mission 1';
   shop.position.set(15, 0, 0);
   const cream = makeMat('#d9bd87'), teal = makeMat('#334940'), red = makeMat('#b85a40'), wood = makeMat('#76543a'), steel = makeMat('#a6aaa2', 0.28, { metalness: 0.58 });
@@ -185,11 +207,13 @@ function normalizeModel(model, targetHeight = 1.72) {
   const wrapper = new THREE.Group();
   const clone = cloneSkeleton(model.scene);
   wrapper.add(clone);
-  let bounds = new THREE.Box3().setFromObject(wrapper);
+  // Measure skinned vertices: approximate bind-pose bounds include the
+  // oversized rig and were shrinking the visible character to a speck.
+  let bounds = new THREE.Box3().setFromObject(wrapper, true);
   const height = Math.max(0.01, bounds.max.y - bounds.min.y);
   const factor = targetHeight / height;
   wrapper.scale.setScalar(factor);
-  bounds = new THREE.Box3().setFromObject(wrapper);
+  bounds = new THREE.Box3().setFromObject(wrapper, true);
   wrapper.position.y -= bounds.min.y;
   wrapper.traverse(obj => {
     if (!obj.isMesh) return;
@@ -206,7 +230,8 @@ function normalizeModel(model, targetHeight = 1.72) {
 function addActor(id, data, model, position, { playerActor = false, wander = 0 } = {}) {
   const group = new THREE.Group();
   group.name = data.name;
-  const body = normalizeModel(model, playerActor ? 1.8 : 1.7);
+  const bodyHeight = CHARACTER_HEIGHT_METERS;
+  const body = normalizeModel(model, bodyHeight);
   group.add(body);
   group.position.copy(position);
   scene.add(group);
@@ -222,7 +247,7 @@ function addActor(id, data, model, position, { playerActor = false, wander = 0 }
     }
     if (actions.idle) actions.idle.play();
   }
-  const actor = { id, data, group, body, mixer, actions, spawn: position.clone(), wander, wanderTarget: position.clone(), wanderWait: Math.random() * 2 };
+  const actor = { id, data, group, body, bodyHeight, mixer, actions, spawn: position.clone(), wander, wanderTarget: position.clone(), wanderWait: Math.random() * 2 };
   actors.set(id, actor);
   if (!playerActor) npcActors.push(actor);
   return actor;
@@ -241,7 +266,7 @@ function addShopMarker(position, label, hotkey = 'E', color = '#f2bf6d') {
   const ring = new THREE.Mesh(new THREE.TorusGeometry(0.58, 0.055, 8, 36), new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.9 }));
   ring.rotation.x = Math.PI / 2; root.add(ring);
   const badge = new THREE.Sprite(new THREE.SpriteMaterial({ map: addTextTexture(`${hotkey} · ${label}`, 900, 220, '#211d14', '#f0bd68'), depthTest: false }));
-  badge.scale.set(4.2, 1.0, 1); badge.position.y = 1.55; root.add(badge);
+  badge.scale.set(2.8, 0.68, 1); badge.position.y = 1.55; root.add(badge);
   root.userData.baseY = position.y;
   scene.add(root); markers.push(root); return root;
 }
@@ -260,15 +285,118 @@ function buildWorldActors() {
   addActor('worker', npcDirectory.worker, model('men-2.glb'), new THREE.Vector3(48,0,-35), { wander: 1.6 });
   for (const [actor, yaw] of [[mother,Math.PI],[customer,Math.PI],[jomon,0]]) actor.group.rotation.y = yaw;
   buildJuiceShop();
-  for (const actor of [mother,customer,jomon]) {
+  for (const actor of npcActors) {
     actor.nameTag = makeNameTag(actor.data.name);
     scene.add(actor.nameTag);
   }
+  const sheruActor = actors.get('sheru');
+  sheruActor.nameTag = makeNameTag('SHERU'); scene.add(sheruActor.nameTag);
   // The vehicle meshes are Kenney CC0 models; no unknown-license sports-car model is used.
   const carGltf = assets.get('cars/sedan.glb');
   currentCar = makeVehicle(carGltf, new THREE.Vector3(-9,0,-5));
-  player.position.set(5,0,6); player.group.position.copy(player.position);
-  cameraTarget.copy(player.position);
+  player.position.set(-3,0,10); player.group.position.copy(player.position);
+  cameraTarget.copy(player.position).add(new THREE.Vector3(0,PLAYER_CAMERA_LOOK_HEIGHT_METERS,0));
+}
+
+function getEditorObjects() {
+  const result = new Map();
+  for (const actor of actors.values()) result.set(actor.id, { id: actor.id, label: actor.data.name || 'Sheru', group: actor.group, actor });
+  if (currentCar) result.set('sedan', { id: 'sedan', label: 'Sedan', group: currentCar.group });
+  if (juiceShopGroup) result.set('juice-shop', { id: 'juice-shop', label: 'Amma’s Juice Shop', group: juiceShopGroup });
+  return result;
+}
+
+function readObjectTransforms() {
+  const objects = {};
+  for (const [id, item] of getEditorObjects()) objects[id] = { position: item.group.position.toArray(), rotationY: item.group.rotation.y, scale: item.group.scale.x };
+  return objects;
+}
+
+function applyLayout(layout) {
+  if (!layout?.objects) return;
+  for (const [id, transform] of Object.entries(layout.objects)) {
+    const item = getEditorObjects().get(id);
+    if (!item || !transform) continue;
+    if (Array.isArray(transform.position)) item.group.position.fromArray(transform.position);
+    if (Number.isFinite(transform.rotationY)) item.group.rotation.y = transform.rotationY;
+    if (Number.isFinite(transform.scale)) item.group.scale.setScalar(Math.max(0.05, transform.scale));
+    if (item.actor) {
+      item.actor.spawn.copy(item.group.position);
+      item.actor.wanderTarget.copy(item.group.position);
+      if (id === 'sheru') player.position.copy(item.group.position);
+    }
+  }
+  const shopTransform = layout.objects['juice-shop']?.position;
+  if (shopTransform) {
+    const dx = shopTransform[0] - 15, dz = shopTransform[2] - 0;
+    const base = { mother: [15,0,-2.2], fruit: [11.1,0,-2.4], board: [12.2,0,-0.2], blender: [12.2,0,1.7], customer: [22,0,4], payment: [22,0,4] };
+    for (const [key, p] of Object.entries(base)) stationPositions[key].set(p[0]+dx,p[1],p[2]+dz);
+  }
+}
+
+function setObjectTransform(id, position, rotationY = 0, scale = 1) {
+  const item = getEditorObjects().get(id);
+  if (!item) return;
+  item.group.position.fromArray(position); item.group.rotation.y = rotationY; item.group.scale.setScalar(scale);
+  if (item.actor) { item.actor.spawn.copy(item.group.position); item.actor.wanderTarget.copy(item.group.position); if (id === 'sheru') player.position.copy(item.group.position); }
+}
+
+function stagePositions() {
+  const ids = [...actors.keys()];
+  ids.forEach((id, index) => {
+    const col = index % 5, row = Math.floor(index / 5);
+    setObjectTransform(id, [(col-2)*5,0,row*5], 0, 1);
+  });
+  setObjectTransform('sedan',[15,0,5],0,1);
+  setObjectTransform('juice-shop',[0,0,-15],0,1);
+}
+
+function updateEditorFields() {
+  if (!editorSelection) return;
+  const { group } = editorSelection;
+  $('#edit-x').value = group.position.x.toFixed(2); $('#edit-y').value = group.position.y.toFixed(2); $('#edit-z').value = group.position.z.toFixed(2);
+  $('#edit-yaw').value = THREE.MathUtils.radToDeg(group.rotation.y).toFixed(0); $('#edit-scale').value = group.scale.x.toFixed(2);
+}
+
+function selectEditorObject(id) {
+  editorSelection = editorObjects.get(id) || null;
+  if (editorSelectionBox) scene.remove(editorSelectionBox);
+  editorSelectionBox = editorSelection ? new THREE.BoxHelper(editorSelection.group, '#f1bd6d') : null;
+  if (editorSelectionBox) scene.add(editorSelectionBox);
+  updateEditorFields();
+}
+
+function enterEditing() {
+  editing = true; titleOpen = false; paused = false; storyMode = false; gameMode = 'editing';
+  $('#title-screen').classList.add('hidden'); $('#hud').classList.add('hidden'); $('#cutscene').classList.add('hidden');
+  $('#editor-panel').classList.remove('hidden'); $('#pause-menu').classList.add('hidden');
+  mapRoot.visible = false; editorGrid.visible = true; player.group.visible = true;
+  if (!defaultLayout) defaultLayout = { objects: readObjectTransforms() };
+  if (savedLayout?.objects) applyLayout(savedLayout); else stagePositions();
+  editorObjects = getEditorObjects();
+  const select = $('#editor-object'); select.replaceChildren();
+  for (const item of editorObjects.values()) { const option=document.createElement('option'); option.value=item.id; option.textContent=item.label; select.append(option); }
+  selectEditorObject('sheru');
+  const cameraData = savedLayout?.camera || {};
+  editorCameraDistance = 24; gameCameraDistance = cameraData.gameDistance ?? 2;
+  $('#edit-camera').value = String(editorCameraDistance); $('#edit-camera-value').textContent = String(editorCameraDistance);
+  $('#edit-game-camera').value = String(gameCameraDistance); $('#edit-game-camera-value').textContent = String(gameCameraDistance);
+  cameraYaw = cameraData.yaw ?? 0.25; cameraPitch = cameraData.pitch ?? 0.25;
+  editorCameraTarget.set(0,1,0); cameraTarget.copy(editorCameraTarget);
+  $('#editor-status').textContent = savedLayout ? 'Loaded your saved layout. Select and edit any item.' : 'Arrange the characters, shop, and car. Save to use this layout in both modes.';
+}
+
+function saveEditorLayout() {
+  const layout = { version: 1, objects: readObjectTransforms(), camera: { gameDistance: gameCameraDistance, yaw: cameraYaw, pitch: cameraPitch } };
+  localStorage.setItem('sheru-kochi-layout', JSON.stringify(layout)); savedLayout = layout;
+  $('#editor-status').textContent = 'Layout saved on this device. Story and Open World will use it.';
+}
+
+function exitEditing() {
+  editing = false; $('#editor-panel').classList.add('hidden'); $('#title-screen').classList.remove('hidden');
+  mapRoot.visible = true; editorGrid.visible = false; titleOpen = true;
+  if (editorSelectionBox) scene.remove(editorSelectionBox); editorSelectionBox = null; editorSelection = null;
+  applyLayout(savedLayout || defaultLayout);
 }
 
 function makeNameTag(name) {
@@ -276,7 +404,7 @@ function makeNameTag(name) {
   const c = canvas.getContext('2d'); c.fillStyle = '#17201ddd'; c.beginPath(); c.roundRect(12, 15, 488, 100, 22); c.fill();
   c.fillStyle = '#f5e8cd'; c.font = '700 46px Segoe UI, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(name.toUpperCase(), 256, 65);
   const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(canvas), transparent: true, depthTest: false }));
-  sprite.scale.set(2.4,0.6,1); sprite.position.y=2.5; sprite.userData.isNameTag=true; return sprite;
+  sprite.scale.set(2.4,0.6,1); sprite.position.y=0.6; sprite.userData.isNameTag=true; return sprite;
 }
 
 function makeVehicle(model, position) {
@@ -355,6 +483,7 @@ function setMissionStep(step, message = null) {
 
 function startCutscene() {
   cutsceneIndex = 0;
+  cameraYaw = Math.PI;
   $('#cutscene').classList.remove('hidden');
   $('#hud').classList.add('hidden');
   showCutsceneLine();
@@ -368,7 +497,7 @@ function showCutsceneLine() {
   $('#cutscene-line').textContent = item.line;
   const actor = actors.get(item.character);
   if (actor) {
-    cameraTarget.copy(actor.group.position).add(new THREE.Vector3(0,1.2,0));
+    cameraTarget.copy(actor.group.position).add(new THREE.Vector3(0,1.1,0));
     cameraYaw += 0.035;
   }
 }
@@ -384,12 +513,19 @@ function finishCutscene() {
   cutsceneIndex = -1;
   $('#cutscene').classList.add('hidden');
   $('#hud').classList.remove('hidden');
-  player.position.set(5,0,6); player.group.position.copy(player.position);
+  player.group.position.copy(player.position);
+  cameraYaw = savedLayout?.camera?.yaw ?? 0.08;
+  cameraTarget.copy(player.position).add(new THREE.Vector3(0,PLAYER_CAMERA_LOOK_HEIGHT_METERS,0));
   setMissionStep(0);
   missionUpdate('MISSION STARTED · JUICE MASTER');
 }
 
 function startMode(mode) {
+  editing = false; editorGrid.visible = false; mapRoot.visible = true; $('#editor-panel').classList.add('hidden');
+  applyLayout(savedLayout); gameCameraDistance = savedLayout?.camera?.gameDistance ?? 2;
+  cameraYaw = savedLayout?.camera?.yaw ?? 0.08; cameraPitch = savedLayout?.camera?.pitch ?? 0.25;
+  player.group.visible = true; inCar = false;
+  cameraTarget.copy(player.position).add(new THREE.Vector3(0,PLAYER_CAMERA_LOOK_HEIGHT_METERS,0));
   storyMode = mode === 'story'; gameMode = storyMode ? 'story' : 'open'; paused = false; titleOpen = false;
   $('#title-screen').classList.add('hidden'); $('#pause-menu').classList.add('hidden');
   $('#hud').classList.remove('hidden');
@@ -572,6 +708,7 @@ async function toggleRecording() {
 }
 
 function updateNpcWander(dt) {
+  if (editing) return;
   for (const npc of npcActors) {
     if (!npc.wander || activeNpc === npc) continue;
     npc.wanderWait -= dt;
@@ -584,12 +721,12 @@ function updateNpcWander(dt) {
       delta.normalize(); npc.group.position.addScaledVector(delta,dt*0.72); npc.group.rotation.y=Math.atan2(delta.x,delta.z); npc.actions.walk?.play();
     } else npc.actions.walk?.fadeOut(0.15);
     npc.mixer?.update(dt);
-    if(npc.nameTag){npc.nameTag.position.set(npc.group.position.x,npc.group.position.y+2.5,npc.group.position.z)}
+    if(npc.nameTag){npc.nameTag.position.set(npc.group.position.x,npc.group.position.y+npc.bodyHeight+0.6,npc.group.position.z)}
   }
 }
 
 function updatePlayer(dt) {
-  if (storyMode && cutsceneIndex >= 0) return;
+  if (editing || (storyMode && cutsceneIndex >= 0)) return;
   if (activeNpc || titleOpen || paused) return;
   const forwardInput = (keys.has('w') || keys.has('arrowup') ? 1 : 0) - (keys.has('s') || keys.has('arrowdown') ? 1 : 0);
   const sideInput = (keys.has('d') || keys.has('arrowright') ? 1 : 0) - (keys.has('a') || keys.has('arrowleft') ? 1 : 0);
@@ -644,15 +781,20 @@ function updateInteractionPrompt() {
 }
 
 function updateCamera(dt) {
-  if (storyMode && cutsceneIndex>=0) {
+  if (editing) {
+    cameraTarget.lerp(editorCameraTarget,Math.min(1,dt*4));
+    const lift=Math.max(4,editorCameraDistance*0.32);
+    cameraWanted.set(cameraTarget.x-Math.sin(cameraYaw)*editorCameraDistance,cameraTarget.y+lift+cameraPitch*5,cameraTarget.z+Math.cos(cameraYaw)*editorCameraDistance);
+  } else if (storyMode && cutsceneIndex>=0) {
     cameraTarget.lerp(actors.get(openingCutscene[cutsceneIndex]?.character)?.group.position.clone().add(new THREE.Vector3(0,1.1,0)) || player.position, Math.min(1,dt*0.7));
-    const closeDistance=4.5;
-    cameraWanted.set(cameraTarget.x-Math.sin(cameraYaw)*closeDistance,cameraTarget.y+1.5+cameraPitch*3,cameraTarget.z+Math.cos(cameraYaw)*closeDistance);
+    const closeDistance=CUTSCENE_CAMERA_DISTANCE_METERS;
+    cameraWanted.set(cameraTarget.x-Math.sin(cameraYaw)*closeDistance,cameraTarget.y+0.9+cameraPitch*1.5,cameraTarget.z+Math.cos(cameraYaw)*closeDistance);
   } else {
     const targetPos=inCar&&currentCar?currentCar.group.position:player.position;
-    cameraTarget.lerp(targetPos.clone().add(new THREE.Vector3(0,inCar?1.3:1.25,0)),Math.min(1,dt*5));
-    const distance=inCar?10:7.6;
-    cameraWanted.set(cameraTarget.x-Math.sin(cameraYaw)*distance,cameraTarget.y+2.6+cameraPitch*5,cameraTarget.z+Math.cos(cameraYaw)*distance);
+    cameraTarget.lerp(targetPos.clone().add(new THREE.Vector3(0,inCar?1.3:1.1,0)),Math.min(1,dt*5));
+    const distance=inCar?10:gameCameraDistance;
+    const cameraLift=inCar?2.6:0.9;
+    cameraWanted.set(cameraTarget.x-Math.sin(cameraYaw)*distance,cameraTarget.y+cameraLift+cameraPitch*5,cameraTarget.z+Math.cos(cameraYaw)*distance);
   }
   camera.position.lerp(cameraWanted,Math.min(1,dt*4.7));
   camera.lookAt(cameraTarget);
@@ -662,13 +804,14 @@ function updateMarkers(dt) {
   for (const marker of markers) {
     marker.position.y = marker.userData.baseY + Math.sin(elapsed*2.3)*0.12;
     marker.rotation.y += dt*0.32;
-    const show = storyMode && !missionComplete && storyStation();
+    const show = storyMode && !titleOpen && cutsceneIndex < 0 && !paused && !missionComplete && storyStation();
     marker.visible = !!show;
   }
 }
 
-function animate() {
+function animate(timestamp) {
   requestAnimationFrame(animate);
+  clock.update(timestamp);
   const dt=Math.min(clock.getDelta(),0.04); elapsed+=dt; frameTime+=dt;
   if (!paused) {
     updatePlayer(dt);
@@ -676,8 +819,10 @@ function animate() {
     updateNpcWander(dt);
     updateCamera(dt);
     updateMarkers(dt);
+    if (editing && editorSelectionBox) editorSelectionBox.update();
+    for (const actor of actors.values()) if (actor.nameTag) actor.nameTag.position.set(actor.group.position.x,actor.group.position.y+actor.bodyHeight*actor.group.scale.y+0.6,actor.group.position.z);
     if (frameTime>0.24) { updateInteractionPrompt(); frameTime=0; }
-    if (elapsed-autoSaveAt>30 && !titleOpen) { saveGame(false); autoSaveAt=elapsed; }
+    if (elapsed-autoSaveAt>30 && !titleOpen && !editing) { saveGame(false); autoSaveAt=elapsed; }
   }
   renderer.render(scene,camera);
 }
@@ -704,6 +849,8 @@ async function loadWorld() {
     map.traverse(o=>{if(o.isMesh){o.receiveShadow=true;o.castShadow=false;o.frustumCulled=true;if(o.material){const materials=Array.isArray(o.material)?o.material:[o.material];for(const m of materials){if(m.map)m.map.colorSpace=THREE.SRGBColorSpace;m.side=THREE.DoubleSide}}}});
     mapRoot.add(map);
     buildWorldActors();
+    defaultLayout = { objects: readObjectTransforms() };
+    applyLayout(savedLayout);
     worldLoaded=true;
     $('#loading-screen').classList.add('hidden');
     $('#title-screen').classList.remove('hidden');
@@ -729,6 +876,16 @@ async function checkLocalServices() {
 window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.6))});
 document.addEventListener('keydown',event=>{
   const key=event.key.toLowerCase();
+  if (editing) {
+    if (key==='escape') { exitEditing(); return; }
+    if (event.target.matches('input,select')) return;
+    const step = event.shiftKey ? 2 : 0.5;
+    if (key==='w'||key==='arrowup') editorCameraTarget.z -= step;
+    if (key==='s'||key==='arrowdown') editorCameraTarget.z += step;
+    if (key==='a'||key==='arrowleft') editorCameraTarget.x -= step;
+    if (key==='d'||key==='arrowright') editorCameraTarget.x += step;
+    return;
+  }
   if(['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright','shift',' '].includes(key)&&!event.target.matches('input')){keys.add(key);if(key===' ')event.preventDefault()}
   if(event.repeat)return;
   if(key==='escape'){
@@ -751,9 +908,11 @@ canvas.addEventListener('pointerdown',event=>{pointerDown=true;lastPointer={x:ev
 canvas.addEventListener('pointerup',()=>{pointerDown=false;lastPointer=null});
 canvas.addEventListener('pointermove',event=>{if(!pointerDown||!lastPointer)return;cameraYaw-=(event.clientX-lastPointer.x)*0.003;cameraPitch=THREE.MathUtils.clamp(cameraPitch+(event.clientY-lastPointer.y)*0.0018,-0.1,0.72);lastPointer={x:event.clientX,y:event.clientY}});
 canvas.addEventListener('contextmenu',event=>event.preventDefault());
+canvas.addEventListener('wheel',event=>{if(!editing)return;event.preventDefault();editorCameraDistance=THREE.MathUtils.clamp(editorCameraDistance+Math.sign(event.deltaY)*1.5,8,55);$('#edit-camera').value=String(editorCameraDistance);$('#edit-camera-value').textContent=String(editorCameraDistance)},{passive:false});
 
 $('#start-story').onclick=()=>startMode('story');
 $('#start-free').onclick=()=>startMode('free');
+$('#start-edit').onclick=enterEditing;
 $('#continue-game').onclick=()=>startMode('story');
 $('#skip-cutscene').onclick=()=>finishCutscene();
 $('#cutscene').addEventListener('click',event=>{if(event.target.id!=='skip-cutscene')advanceCutscene()});
@@ -767,5 +926,22 @@ $('#voice-toggle').onclick=()=>{voiceOn=!voiceOn;$('#voice-toggle').textContent=
 $('#resume-game').onclick=()=>setPause(false);
 $('#save-game').onclick=()=>saveGame(true);
 $('#back-title').onclick=()=>{saveGame(false);setPause(false);$('#hud').classList.add('hidden');$('#title-screen').classList.remove('hidden');titleOpen=true};
+
+$('#editor-object').onchange=event=>selectEditorObject(event.target.value);
+for (const id of ['edit-x','edit-y','edit-z','edit-yaw','edit-scale']) $('#'+id).addEventListener('input',()=>{
+  if(!editorSelection)return;
+  const n=(key,fallback=0)=>Number.isFinite(Number($('#'+key).value))?Number($('#'+key).value):fallback;
+  const {group}=editorSelection;
+  group.position.set(n('edit-x'),n('edit-y'),n('edit-z'));
+  group.rotation.y=THREE.MathUtils.degToRad(n('edit-yaw'));
+  group.scale.setScalar(THREE.MathUtils.clamp(n('edit-scale',1),0.05,20));
+  if(editorSelection.actor){editorSelection.actor.spawn.copy(group.position);editorSelection.actor.wanderTarget.copy(group.position);if(editorSelection.id==='sheru')player.position.copy(group.position);}
+  if(editorSelection.id==='juice-shop')applyLayout({objects:{'juice-shop':{position:group.position.toArray()}}});
+});
+$('#edit-camera').addEventListener('input',event=>{editorCameraDistance=Number(event.target.value);$('#edit-camera-value').textContent=String(editorCameraDistance)});
+$('#edit-game-camera').addEventListener('input',event=>{gameCameraDistance=Number(event.target.value);$('#edit-game-camera-value').textContent=String(gameCameraDistance)});
+$('#save-layout').onclick=saveEditorLayout;
+$('#reset-layout').onclick=()=>{stagePositions();editorCameraDistance=24;gameCameraDistance=2;cameraYaw=0.25;cameraPitch=0.25;$('#edit-camera').value='24';$('#edit-camera-value').textContent='24';$('#edit-game-camera').value='2';$('#edit-game-camera-value').textContent='2';selectEditorObject(editorSelection?.id||'sheru');$('#editor-status').textContent='Staging layout reset. Save to keep these positions.';};
+$('#editor-exit').onclick=exitEditing;
 
 loadWorld();
